@@ -1,6 +1,7 @@
 html,
 body {
-    background-color: #b7b7b7;
+    /* background-color: #c42c2c; */
+    /* background-color: #b7b7b7; */
 }
 
 #map {
@@ -9,5 +10,5 @@ body {
 }
 
 .svg-layer {
-    background-color: aqua;
+    /* background-color: aqua; */
 }
