@@ -6,7 +6,7 @@ html, body {
 }
 #map {
   position: absolute;
-  top: 0;
+  top: 20px;
   bottom: 0;
   width: 100%;
 }
