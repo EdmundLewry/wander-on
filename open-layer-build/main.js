@@ -27,7 +27,7 @@ const pathStyle = new Style({
 
 const gpxFormat = new GPX({extractStyles: false});
 const gpxSource = new Vector({
-  url: "./local-park.gpx",
+  url: "../data/local-park.gpx",
   format: gpxFormat,
 });
 
