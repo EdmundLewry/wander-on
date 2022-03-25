@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<gpx version="1.0"
+     creator="BasicAirData GPS Logger 3.0.2"
+     xmlns="http://www.topografix.com/GPX/1/0"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd">
+<name>GPS Logger 20220101-161340</name>
+<desc>Empty</desc>
+<time>2022-01-01T16:57:59Z</time>
+<trk>
+ <name>Pinpoint</name>
+ <trkseg>
+  <trkpt lat="51.40595296" lon="-0.05917491"><ele>0</ele><time>2022-01-01T00:00:00Z</time><speed>0</speed><sat>8</sat></trkpt>
+ </trkseg>
+</trk>
+</gpx>
+ 

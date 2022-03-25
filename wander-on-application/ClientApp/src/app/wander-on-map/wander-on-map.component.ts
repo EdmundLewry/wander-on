@@ -1,5 +1,5 @@
 import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, NgZone, OnInit, Output } from '@angular/core';
-import {Map, View} from 'ol';
+import {Feature, Map, View} from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import XYZ from 'ol/source/XYZ';
 import {Style, Stroke, Fill} from 'ol/style';
@@ -10,6 +10,7 @@ import { fromLonLat } from 'ol/proj';
 import Raster from 'ol/source/Raster';
 import ImageLayer from 'ol/layer/Image';
 import { DragAndDrop, defaults as defaultInteractions } from 'ol/interaction';
+import { Geometry } from 'ol/geom';
 
 @Component({
   selector: 'app-wander-on-map',
@@ -21,7 +22,7 @@ export class WanderOnMapComponent implements AfterViewInit  {
   Map: Map|null = null;
   public gpxFormat = new GPX();
   public gpxSource = new Vector({
-    url: "./assets/local-park.gpx",
+    url: "./assets/empty.gpx",
     format: this.gpxFormat,
   });
 
@@ -62,8 +63,9 @@ export class WanderOnMapComponent implements AfterViewInit  {
       if(!(pixels as number[][]))
         return [183, 183, 183, 255];
 
+        //TODO: to avoid use of Empty gpx, can I find a different condition for the pixel data?
       let pixelData = pixels as number[][];
-      if(pixelData[1][3] === 0) {
+      if(pixelData[1][3] === 0 || pixelData[1][3] === undefined) {
         return [183, 183, 183, 255];
       }
       return pixels[0];
@@ -100,18 +102,22 @@ export class WanderOnMapComponent implements AfterViewInit  {
       }),
     });
 
+    let gpx = this.gpxSource;
     this.fileDropInteraction.on('addfeatures', function (event) {
       console.log("Adding new features");
-      // this.gpxSource.addFeatures(event.features);
+      gpx.addFeatures(event.features as Feature<Geometry>[]);
     });
   }
 
   public printFeatures() {
     console.log("button clicked");
     console.log(this.Map);
+
+    let gpxFormat = this.gpxFormat;
+    let geoJsonFormat = this.geoJsonFormat;
     this.gpxSource.forEachFeature( function(feature) {
-      //console.log(this.gpxFormat.writeFeatures([feature]));
-      // console.log(geoJsonFormat.writeFeature(feature));
+      console.log(gpxFormat.writeFeatures([feature]));
+      console.log(geoJsonFormat.writeFeature(feature));
       //https://stackoverflow.com/questions/2601745/how-to-convert-vector-layer-coordinates-into-map-latitude-and-longitude-in-openl/2607145#2607145
     });
   }
