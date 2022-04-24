@@ -1,4 +1,4 @@
-namespace wander_on_application;
+namespace cbs.wanderOn;
 
 public class WeatherForecast
 {

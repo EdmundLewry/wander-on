@@ -1,17 +1,16 @@
+using GeoJSON.Text.Feature;
 using Microsoft.AspNetCore.Mvc;
-using System.IO;
 
 namespace cbs.wanderOn.Controllers;
 
 [ApiController]
-[Route("[controller]")]
-public class MapController : ControllerBase {
-    private ILogger<MapController> Logger {get; set;};
-    private MapService MapService { get; private set; }
+[Route("api/[controller]")]
+public class MapController : ControllerBase 
+{
+    private ILogger<MapController> Logger {get; set;}
+    private IMapService MapService { get; set; }
 
-    private readonly string _filePath = "";
-
-    public MapController(ILogger<MapController> logger, MapService mapService) 
+    public MapController(ILogger<MapController> logger, IMapService mapService) 
     {
         Logger = logger;
         MapService = mapService;
@@ -20,6 +19,14 @@ public class MapController : ControllerBase {
     [HttpGet]
     public string GetTravelledRoutes()
     {
+        Logger.LogInformation("GET request received");
         return MapService.GetTravelData();
+    }
+
+    [HttpPost]
+    public void DeliverTravelledRoutes(object data)
+    {
+        Logger.LogInformation($"POST request received");
+        MapService.SaveTravelData(data.ToString()!);
     }
 }

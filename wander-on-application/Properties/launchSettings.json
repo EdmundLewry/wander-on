@@ -11,7 +11,7 @@
     "wander_on_application": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:7149;http://localhost:5089",
+      "applicationUrl": "http://localhost:5089", //https://localhost:7149;
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy"
