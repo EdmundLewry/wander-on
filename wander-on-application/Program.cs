@@ -2,10 +2,8 @@ using cbs.wanderOn.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllersWithViews();
-builder.Services.AddTransient<IMapService, MapService>();
+builder.Services.AddTransient<IMapService, FileMapService>();
 
 builder.Services.AddSwaggerGen();
 

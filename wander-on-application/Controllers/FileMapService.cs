@@ -1,12 +1,12 @@
 namespace cbs.wanderOn.Controllers;
 
-public class MapService : IMapService
+public class FileMapService : IMapService
 {
     private readonly string _filePath = "./routes.json";
 
-    public ILogger<MapService> Logger { get; }
+    public ILogger<FileMapService> Logger { get; }
 
-    public MapService(ILogger<MapService> logger)
+    public FileMapService(ILogger<FileMapService> logger)
     {
         Logger = logger;
     }

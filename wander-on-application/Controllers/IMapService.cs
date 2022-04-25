@@ -1,8 +1,7 @@
-namespace cbs.wanderOn.Controllers
+namespace cbs.wanderOn.Controllers;
+
+public interface IMapService
 {
-    public interface IMapService
-    {
-        string GetTravelData();
-        void SaveTravelData(string data);
-    }
+    string GetTravelData();
+    void SaveTravelData(string data);
 }
