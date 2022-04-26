@@ -1,7 +1,31 @@
+.navbar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: .5rem;
+  padding-bottom: .5rem;
+  width: 50%;
+}
+
 a.navbar-brand {
   white-space: normal;
   text-align: center;
   word-break: break-all;
+}
+
+.nav-toggle-container {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.navbar-toggler {
+  background-color: wheat;
 }
 
 html {
@@ -15,4 +39,23 @@ html {
 
 .box-shadow {
   box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  padding: 10px 0;
+  width: 100%;
+}
+
+.nav-btn:hover {
+  background-color: gray;
+}
+
+.navbar-nav {
+  margin-top: 2px;
+  background-color: wheat;
+}
+.navbar-nav>li {
+  border: 1px black solid;
 }

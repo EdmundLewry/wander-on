@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'app-nav-menu',
@@ -6,6 +6,8 @@ import { Component } from '@angular/core';
   styleUrls: ['./nav-menu.component.css']
 })
 export class NavMenuComponent {
+  @Output() print: EventEmitter<any> = new EventEmitter();
+
   isExpanded = false;
 
   collapse() {
@@ -14,5 +16,9 @@ export class NavMenuComponent {
 
   toggle() {
     this.isExpanded = !this.isExpanded;
+  }
+
+  printFeatures() {
+    this.print.emit();
   }
 }
