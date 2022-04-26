@@ -7,6 +7,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 })
 export class NavMenuComponent {
   @Output() print: EventEmitter<any> = new EventEmitter();
+  @Output() add: EventEmitter<any> = new EventEmitter();
 
   isExpanded = false;
 
@@ -20,5 +21,9 @@ export class NavMenuComponent {
 
   printFeatures() {
     this.print.emit();
+  }
+  
+  addData() {
+    this.add.emit();
   }
 }

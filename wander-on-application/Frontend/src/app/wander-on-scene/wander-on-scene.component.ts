@@ -8,7 +8,7 @@ import { WanderOnMapComponent } from '../wander-on-map/wander-on-map.component';
 })
 export class WanderOnSceneComponent implements OnInit {
   @ViewChild(WanderOnMapComponent) _map!: WanderOnMapComponent;
-  
+
   constructor() { }
 
   ngOnInit(): void {
@@ -16,6 +16,9 @@ export class WanderOnSceneComponent implements OnInit {
 
   public printFeatures() {
     this._map.printFeatures();
+  }
+  public addData() {
+    console.log("Add Data");
   }
 
 }
