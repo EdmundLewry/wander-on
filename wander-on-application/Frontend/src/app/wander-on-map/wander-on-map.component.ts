@@ -38,6 +38,8 @@ export class WanderOnMapComponent implements AfterViewInit {
   private fileDropInteraction : DragAndDrop;
   private geoJsonFormat : GeoJSON;
 
+  private readonly mapUrl = this.baseUrl + 'api/map';
+
   constructor(private zone: NgZone, private cd: ChangeDetectorRef, private http: HttpClient, @Inject('BASE_URL') private baseUrl: string) { 
     this.gpxFormat  = new GPX();
     this.geoJsonFormat = new GeoJSON();
@@ -118,19 +120,20 @@ export class WanderOnMapComponent implements AfterViewInit {
 
     let gpx = this.gpxSource;
     let httpClient = this.http;
-    let url = this.baseUrl + 'api/map';
+    let url = this.mapUrl;
     let geoJsonFormat = this.geoJsonFormat;
     this.fileDropInteraction.on('addfeatures', function (event) {
       console.log("Adding new features");
       gpx.addFeatures(event.features as Feature<Geometry>[]);
       httpClient.post(url, geoJsonFormat.writeFeaturesObject(gpx.getFeatures())).subscribe(
         result => { console.log(result); },
-        error => { console.log(error); });
+        error => { console.log(error); }
+      );
     });
   }
 
   private retrieveTravelData() {
-    this.http.get<string>(this.baseUrl + 'api/map').subscribe(result => {
+    this.http.get<string>(this.mapUrl).subscribe(result => {
       if(result != null) {
         this.gpxSource.clear();
         let features : Feature<Geometry>[] = this.geoJsonFormat.readFeatures(result);
@@ -151,5 +154,15 @@ export class WanderOnMapComponent implements AfterViewInit {
     //   console.log(gpxFormat.writeFeatures([feature]));
     //   //https://stackoverflow.com/questions/2601745/how-to-convert-vector-layer-coordinates-into-map-latitude-and-longitude-in-openl/2607145#2607145
     // });
+  }
+
+  public addFeatureData(data: string) {
+    let features : Feature<Geometry>[] = this.gpxFormat.readFeatures(data, {featureProjection: 'EPSG:3857'});
+    this.gpxSource.addFeatures(features);
+
+    this.http.post(this.mapUrl, this.geoJsonFormat.writeFeaturesObject(this.gpxSource.getFeatures())).subscribe(
+      result => { console.log(result); },
+      error => { console.log(error); }
+    );
   }
 }

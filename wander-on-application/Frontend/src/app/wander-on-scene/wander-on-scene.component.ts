@@ -17,8 +17,10 @@ export class WanderOnSceneComponent implements OnInit {
   public printFeatures() {
     this._map.printFeatures();
   }
-  public addData() {
-    console.log("Add Data");
+  public addData(file: File) {
+    file.text().then((data) => {
+      this._map.addFeatureData(data);
+    });
   }
 
 }

@@ -7,7 +7,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 })
 export class NavMenuComponent {
   @Output() print: EventEmitter<any> = new EventEmitter();
-  @Output() add: EventEmitter<any> = new EventEmitter();
+  @Output() add: EventEmitter<File> = new EventEmitter();
 
   isExpanded = false;
 
@@ -23,7 +23,7 @@ export class NavMenuComponent {
     this.print.emit();
   }
   
-  addData() {
-    this.add.emit();
+  onFileSelected(event: any) {
+    this.add.emit(event.target.files[0]);
   }
 }
