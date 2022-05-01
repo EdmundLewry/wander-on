@@ -20,28 +20,28 @@ import { HttpClient } from '@angular/common/http';
 })
 export class WanderOnMapComponent implements AfterViewInit {
   @Output() mapReady = new EventEmitter<Map | null>();
-  
+
   private readonly attributions =
-  '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> ' +
-  '<a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>';
-  
+    '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> ' +
+    '<a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>';
+
   private readonly key = "201kiHc1yfrCuvBeKrfe";
-  
+
   private Map: Map | null = null;
-  private gpxFormat : GPX;
-  private gpxSource : Vector;
-  private base : TileLayer<XYZ>;
-  private pathStyle : Style;
-  private gpxLayer : VectorImageLayer<Vector>;
-  private raster : Raster;
-  private fog : ImageLayer<Raster>;
-  private fileDropInteraction : DragAndDrop;
-  private geoJsonFormat : GeoJSON;
+  private gpxFormat: GPX;
+  private gpxSource: Vector;
+  private base: TileLayer<XYZ>;
+  private pathStyle: Style;
+  private gpxLayer: VectorImageLayer<Vector>;
+  private raster: Raster;
+  private fog: ImageLayer<Raster>;
+  private fileDropInteraction: DragAndDrop;
+  private geoJsonFormat: GeoJSON;
 
   private readonly mapUrl = this.baseUrl + 'api/map';
 
-  constructor(private zone: NgZone, private cd: ChangeDetectorRef, private http: HttpClient, @Inject('BASE_URL') private baseUrl: string) { 
-    this.gpxFormat  = new GPX();
+  constructor(private zone: NgZone, private cd: ChangeDetectorRef, private http: HttpClient, @Inject('BASE_URL') private baseUrl: string) {
+    this.gpxFormat = new GPX();
     this.geoJsonFormat = new GeoJSON();
 
     this.base = new TileLayer({
@@ -52,7 +52,7 @@ export class WanderOnMapComponent implements AfterViewInit {
         tileSize: 512,
       })
     });
-    
+
     this.pathStyle = new Style({
       stroke: new Stroke({
         color: "#f00",
@@ -75,17 +75,57 @@ export class WanderOnMapComponent implements AfterViewInit {
 
     this.raster = new Raster({
       sources: [this.base, this.gpxLayer],
-      operation: function(pixels, data) {
-        if(!(pixels as number[][]))
-          return [183, 183, 183, 255];
-  
-          //TODO: to avoid use of Empty gpx, can I find a different condition for the pixel data?
-        let pixelData = pixels as number[][];
-        if(pixelData[1][3] === 0 || pixelData[1][3] === undefined) {
-          return [183, 183, 183, 255];
+      operation: function (images, data) {
+        const base = images[0] as ImageData;
+        const gpx = images[1] as ImageData;
+        const width = gpx.width;
+        const height = gpx.height;
+        const shadeData = new Uint8ClampedArray(width * height * 4);
+        const maxX = width - 1;
+        const maxY = height - 1;
+        const fogColour = [183, 183, 183, 255];
+
+        let pixelX, pixelY, offset;
+
+        const clampNumber = (num: number, a: number, b: number) => Math.max(Math.min(num, Math.max(a, b)), Math.min(a, b));
+        const dist = (x1: number, y1: number, x2: number, y2: number) => Math.sqrt(((x1 - x2)*(x1 - x2)) + ((y1 - y2)*(y1-y2)));
+        function distanceToNearestEmpty(imageData: ImageData, x: number, y: number): number {
+          const neighbourhood = 5;
+          const maxDist = dist(x,y, x+neighbourhood, y+neighbourhood);
+          let pixelOffset = (y * imageData.width + x) * 4;
+          let alphaPixel = pixelOffset + 3;
+
+          if (imageData.data[alphaPixel] === 0 || imageData.data[alphaPixel] === undefined)
+            return 0;
+
+          let testX, testY, testPixel;
+          let nearest = 1;
+          for(let x0 = (neighbourhood * -1); x0 < neighbourhood; ++x0) {
+            for(let y0 = (neighbourhood * -1); y0 < neighbourhood; ++y0) {
+              testX = clampNumber(x + x0, 0, imageData.width);
+              testY = clampNumber(y + y0, 0, imageData.height);
+              testPixel = (testY * imageData.width + testX) * 4;
+              if(imageData.data[testPixel + 3] === 0 || imageData.data[testPixel + 3] === undefined) {
+                nearest = dist(x,y,testX, testY) / maxDist;
+              }
+            }
+          }
+          return nearest;
         }
-        return pixels[0];
+
+        for (pixelY = 0; pixelY <= maxY; ++pixelY) {
+          for (pixelX = 0; pixelX <= maxX; ++pixelX) {
+            offset = (pixelY * width + pixelX) * 4;
+            let proximity = distanceToNearestEmpty(gpx, pixelX, pixelY);
+            shadeData[offset] = fogColour[0] - ((fogColour[0] - base.data[offset]) * proximity)
+            shadeData[offset + 1] = fogColour[1] - ((fogColour[1] - base.data[offset + 1]) * proximity)
+            shadeData[offset + 2] = fogColour[2] - ((fogColour[2] - base.data[offset + 2]) * proximity)
+            shadeData[offset + 3] = fogColour[3] - ((fogColour[3] - base.data[offset + 3]) * proximity)
+          }
+        }
+        return { data: shadeData, width: width, height: height };
       },
+      operationType: 'image'
     });
 
     this.fog = new ImageLayer({
@@ -134,9 +174,9 @@ export class WanderOnMapComponent implements AfterViewInit {
 
   private retrieveTravelData() {
     this.http.get<string>(this.mapUrl).subscribe(result => {
-      if(result != null) {
+      if (result != null) {
         this.gpxSource.clear();
-        let features : Feature<Geometry>[] = this.geoJsonFormat.readFeatures(result);
+        let features: Feature<Geometry>[] = this.geoJsonFormat.readFeatures(result);
         this.gpxSource.addFeatures(features);
       }
     }, error => console.error(error));
@@ -157,7 +197,7 @@ export class WanderOnMapComponent implements AfterViewInit {
   }
 
   public addFeatureData(data: string) {
-    let features : Feature<Geometry>[] = this.gpxFormat.readFeatures(data, {featureProjection: 'EPSG:3857'});
+    let features: Feature<Geometry>[] = this.gpxFormat.readFeatures(data, { featureProjection: 'EPSG:3857' });
     this.gpxSource.addFeatures(features);
 
     this.http.post(this.mapUrl, this.geoJsonFormat.writeFeaturesObject(this.gpxSource.getFeatures())).subscribe(
