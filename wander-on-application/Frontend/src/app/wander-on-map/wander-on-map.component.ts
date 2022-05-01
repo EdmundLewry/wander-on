@@ -87,30 +87,14 @@ export class WanderOnMapComponent implements AfterViewInit {
 
         let pixelX, pixelY, offset;
 
-        const clampNumber = (num: number, a: number, b: number) => Math.max(Math.min(num, Math.max(a, b)), Math.min(a, b));
-        const dist = (x1: number, y1: number, x2: number, y2: number) => Math.sqrt(((x1 - x2)*(x1 - x2)) + ((y1 - y2)*(y1-y2)));
         function distanceToNearestEmpty(imageData: ImageData, x: number, y: number): number {
-          const neighbourhood = 5;
-          const maxDist = dist(x,y, x+neighbourhood, y+neighbourhood);
           let pixelOffset = (y * imageData.width + x) * 4;
           let alphaPixel = pixelOffset + 3;
 
           if (imageData.data[alphaPixel] === 0 || imageData.data[alphaPixel] === undefined)
             return 0;
 
-          let testX, testY, testPixel;
-          let nearest = 1;
-          for(let x0 = (neighbourhood * -1); x0 < neighbourhood; ++x0) {
-            for(let y0 = (neighbourhood * -1); y0 < neighbourhood; ++y0) {
-              testX = clampNumber(x + x0, 0, imageData.width);
-              testY = clampNumber(y + y0, 0, imageData.height);
-              testPixel = (testY * imageData.width + testX) * 4;
-              if(imageData.data[testPixel + 3] === 0 || imageData.data[testPixel + 3] === undefined) {
-                nearest = dist(x,y,testX, testY) / maxDist;
-              }
-            }
-          }
-          return nearest;
+          return 1;
         }
 
         for (pixelY = 0; pixelY <= maxY; ++pixelY) {
