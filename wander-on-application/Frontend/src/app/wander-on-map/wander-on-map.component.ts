@@ -74,16 +74,16 @@ export class WanderOnMapComponent implements AfterViewInit {
     });
 
     this.raster = new Raster({
-      sources: [this.base, this.gpxLayer],
+      sources: [this.gpxLayer],
       operation: function (images, data) {
-        const base = images[0] as ImageData;
-        const gpx = images[1] as ImageData;
+        const gpx = images[0] as ImageData;
         const width = gpx.width;
         const height = gpx.height;
         const shadeData = new Uint8ClampedArray(width * height * 4);
         const maxX = width - 1;
         const maxY = height - 1;
         const fogColour = [183, 183, 183, 255];
+        const base = [0,0,0,0];
 
         let pixelX, pixelY, offset;
 
@@ -101,10 +101,10 @@ export class WanderOnMapComponent implements AfterViewInit {
           for (pixelX = 0; pixelX <= maxX; ++pixelX) {
             offset = (pixelY * width + pixelX) * 4;
             let proximity = distanceToNearestEmpty(gpx, pixelX, pixelY);
-            shadeData[offset] = fogColour[0] - ((fogColour[0] - base.data[offset]) * proximity)
-            shadeData[offset + 1] = fogColour[1] - ((fogColour[1] - base.data[offset + 1]) * proximity)
-            shadeData[offset + 2] = fogColour[2] - ((fogColour[2] - base.data[offset + 2]) * proximity)
-            shadeData[offset + 3] = fogColour[3] - ((fogColour[3] - base.data[offset + 3]) * proximity)
+            shadeData[offset] = fogColour[0] - ((fogColour[0] - base[0]) * proximity)
+            shadeData[offset + 1] = fogColour[1] - ((fogColour[1] - base[1]) * proximity)
+            shadeData[offset + 2] = fogColour[2] - ((fogColour[2] - base[2]) * proximity)
+            shadeData[offset + 3] = fogColour[3] - ((fogColour[3] - base[3]) * proximity)
           }
         }
         return { data: shadeData, width: width, height: height };
@@ -113,7 +113,8 @@ export class WanderOnMapComponent implements AfterViewInit {
     });
 
     this.fog = new ImageLayer({
-      source: this.raster
+      source: this.raster,
+      opacity: 0.95
     });
 
     this.fileDropInteraction = new DragAndDrop({
@@ -134,7 +135,7 @@ export class WanderOnMapComponent implements AfterViewInit {
   private initialiseMap(): void {
     this.Map = new Map({
       interactions: defaultInteractions().extend([this.fileDropInteraction]),
-      layers: [this.fog],
+      layers: [this.base, this.fog],
       target: 'map',
       view: new View({
         center: fromLonLat([-0.058898418, 51.406058646]),
