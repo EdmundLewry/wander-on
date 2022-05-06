@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-nav-menu',
@@ -8,22 +8,30 @@ import { Component, EventEmitter, Output } from '@angular/core';
 export class NavMenuComponent {
   @Output() print: EventEmitter<any> = new EventEmitter();
   @Output() add: EventEmitter<File> = new EventEmitter();
+  @Output() switch: EventEmitter<string> = new EventEmitter();
+  @Input() profiles: string[] = [];
 
-  isExpanded = false;
+  public profile = 0;
+  public isExpanded = false;
 
-  collapse() {
+  public collapse() {
     this.isExpanded = false;
   }
 
-  toggle() {
+  public toggle() {
     this.isExpanded = !this.isExpanded;
   }
 
-  printFeatures() {
+  public printFeatures() {
     this.print.emit();
   }
   
-  onFileSelected(event: any) {
+  public onFileSelected(event: any) {
     this.add.emit(event.target.files[0]);
+  }
+
+  public switchProfile() {
+    this.profile = (this.profile + 1)%this.profiles.length;
+    this.switch.emit(this.profiles[this.profile]);
   }
 }

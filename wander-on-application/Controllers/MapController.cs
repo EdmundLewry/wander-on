@@ -9,6 +9,8 @@ public class MapController : ControllerBase
     private ILogger<MapController> Logger {get; set;}
     private IMapService MapService { get; set; }
 
+    private readonly string[] _availableProfiles = new string[2]{"Edmund", "Teddy"};
+
     public MapController(ILogger<MapController> logger, IMapService mapService) 
     {
         Logger = logger;
@@ -16,16 +18,16 @@ public class MapController : ControllerBase
     }
 
     [HttpGet]
-    public string GetTravelledRoutes()
+    public string GetTravelledRoutes([FromQuery] string profile)
     {
-        Logger.LogInformation("GET request received");
-        return MapService.GetTravelData();
+        Logger.LogInformation($"GET request received - {profile} ");
+        return MapService.GetTravelData(profile);
     }
 
     [HttpPost]
-    public void DeliverTravelledRoutes(object data)
+    public void DeliverTravelledRoutes([FromQuery] string profile, [FromBody] object data)
     {
-        Logger.LogInformation($"POST request received");
-        MapService.SaveTravelData(data.ToString()!);
+        Logger.LogInformation($"POST request received {profile}");
+        MapService.SaveTravelData(profile, data.ToString()!);
     }
 }

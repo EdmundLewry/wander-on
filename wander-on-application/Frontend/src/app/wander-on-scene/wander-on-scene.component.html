@@ -2,7 +2,10 @@
     <app-nav-menu
         (print)="printFeatures()"
         (add)="addData($event)"
+        (switch)="switchProfile($event)"
+        [profiles]="profiles"
     >
     </app-nav-menu>
-    <app-wander-on-map></app-wander-on-map>
+    <app-wander-on-map
+        [profile]="profile"></app-wander-on-map>
 </div>

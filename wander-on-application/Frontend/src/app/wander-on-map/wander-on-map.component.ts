@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Inject, NgZone, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, NgZone, Output } from '@angular/core';
 import { Feature, Map, View } from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import XYZ from 'ol/source/XYZ';
@@ -10,8 +10,8 @@ import { fromLonLat } from 'ol/proj';
 import Raster from 'ol/source/Raster';
 import ImageLayer from 'ol/layer/Image';
 import { DragAndDrop, defaults as defaultInteractions } from 'ol/interaction';
-import { Geometry } from 'ol/geom';
-import { HttpClient } from '@angular/common/http';
+import { Geometry, MultiLineString } from 'ol/geom';
+import { WanderDataService } from '../wander-data-service/wander-data.service';
 
 @Component({
   selector: 'app-wander-on-map',
@@ -20,6 +20,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class WanderOnMapComponent implements AfterViewInit {
   @Output() mapReady = new EventEmitter<Map | null>();
+  @Input() profile: string = "";
 
   private readonly attributions =
     '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> ' +
@@ -38,9 +39,10 @@ export class WanderOnMapComponent implements AfterViewInit {
   private fileDropInteraction: DragAndDrop;
   private geoJsonFormat: GeoJSON;
 
-  private readonly mapUrl = this.baseUrl + 'api/map';
-
-  constructor(private zone: NgZone, private cd: ChangeDetectorRef, private http: HttpClient, @Inject('BASE_URL') private baseUrl: string) {
+  constructor(
+    private zone: NgZone, 
+    private dataService: WanderDataService,
+    ) {
     this.gpxFormat = new GPX();
     this.geoJsonFormat = new GeoJSON();
 
@@ -75,7 +77,7 @@ export class WanderOnMapComponent implements AfterViewInit {
 
     this.raster = new Raster({
       sources: [this.gpxLayer],
-      operation: function (images, data) {
+      operation: function (images, _data) {
         const gpx = images[0] as ImageData;
         const width = gpx.width;
         const height = gpx.height;
@@ -144,37 +146,43 @@ export class WanderOnMapComponent implements AfterViewInit {
     });
 
     let gpx = this.gpxSource;
-    let httpClient = this.http;
-    let url = this.mapUrl;
+    let dataService = this.dataService;
     let geoJsonFormat = this.geoJsonFormat;
+    let profile = this.profile;
     this.fileDropInteraction.on('addfeatures', function (event) {
       console.log("Adding new features");
       gpx.addFeatures(event.features as Feature<Geometry>[]);
-      httpClient.post(url, geoJsonFormat.writeFeaturesObject(gpx.getFeatures())).subscribe(
-        result => { console.log(result); },
-        error => { console.log(error); }
-      );
+      dataService.saveWanderData(profile, geoJsonFormat.writeFeaturesObject(gpx.getFeatures()));
     });
   }
 
   private retrieveTravelData() {
-    this.http.get<string>(this.mapUrl).subscribe(result => {
+    this.dataService.getWanderData(this.profile).subscribe(result => {
+      this.gpxSource.clear();
       if (result != null) {
-        this.gpxSource.clear();
         let features: Feature<Geometry>[] = this.geoJsonFormat.readFeatures(result);
         this.gpxSource.addFeatures(features);
       }
+      else
+      {
+        var emptyFeature = new Feature({
+          geometry: new MultiLineString([
+              [
+                [-6587,6693418,0,1640995200]
+              ]
+            ]
+          ),
+          name: 'Empty Feature'
+        });
+        
+        this.gpxSource.addFeature(emptyFeature);
+      }
+
     }, error => console.error(error));
   }
 
   public printFeatures() {
-    // console.log("button clicked");
-    // console.log(this.Map);
-
-    let gpxFormat = this.gpxFormat;
-    let geoJsonFormat = this.geoJsonFormat;
-
-    console.log(geoJsonFormat.writeFeaturesObject(this.gpxSource.getFeatures()));
+    console.log(this.geoJsonFormat.writeFeaturesObject(this.gpxSource.getFeatures()));
     // this.gpxSource.forEachFeature(function (feature) {
     //   console.log(gpxFormat.writeFeatures([feature]));
     //   //https://stackoverflow.com/questions/2601745/how-to-convert-vector-layer-coordinates-into-map-latitude-and-longitude-in-openl/2607145#2607145
@@ -185,9 +193,11 @@ export class WanderOnMapComponent implements AfterViewInit {
     let features: Feature<Geometry>[] = this.gpxFormat.readFeatures(data, { featureProjection: 'EPSG:3857' });
     this.gpxSource.addFeatures(features);
 
-    this.http.post(this.mapUrl, this.geoJsonFormat.writeFeaturesObject(this.gpxSource.getFeatures())).subscribe(
-      result => { console.log(result); },
-      error => { console.log(error); }
-    );
+    this.dataService.saveWanderData(this.profile, this.geoJsonFormat.writeFeaturesObject(this.gpxSource.getFeatures()));
+  }
+
+  public onProfileChanged(profile: string) {
+    this.profile = profile;
+    this.retrieveTravelData();
   }
 }

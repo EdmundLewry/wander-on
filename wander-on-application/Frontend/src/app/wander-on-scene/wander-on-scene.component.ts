@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { WanderOnMapComponent } from '../wander-on-map/wander-on-map.component';
 
 @Component({
@@ -6,21 +6,23 @@ import { WanderOnMapComponent } from '../wander-on-map/wander-on-map.component';
   templateUrl: './wander-on-scene.component.html',
   styleUrls: ['./wander-on-scene.component.css']
 })
-export class WanderOnSceneComponent implements OnInit {
+export class WanderOnSceneComponent {
   @ViewChild(WanderOnMapComponent) _map!: WanderOnMapComponent;
-
-  constructor() { }
-
-  ngOnInit(): void {
-  }
+  public readonly profiles = ["Edmund", "Teddy"];
+  public profile: string = this.profiles[0];
 
   public printFeatures() {
     this._map.printFeatures();
   }
+
   public addData(file: File) {
     file.text().then((data) => {
       this._map.addFeatureData(data);
     });
   }
 
+  public switchProfile(profile: string) {
+    this.profile = profile;
+    this._map.onProfileChanged(profile);
+  }
 }
