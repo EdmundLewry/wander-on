@@ -1,4 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { ProfileDialogComponent } from '../profile-dialog/profile-dialog.component';
 
 @Component({
   selector: 'app-nav-menu',
@@ -11,8 +13,9 @@ export class NavMenuComponent {
   @Output() switch: EventEmitter<string> = new EventEmitter();
   @Input() profiles: string[] = [];
 
-  public profile = 0;
   public isExpanded = false;
+
+  constructor(private dialog: MatDialog) {}
 
   public collapse() {
     this.isExpanded = false;
@@ -30,8 +33,15 @@ export class NavMenuComponent {
     this.add.emit(event.target.files[0]);
   }
 
-  public switchProfile() {
-    this.profile = (this.profile + 1)%this.profiles.length;
-    this.switch.emit(this.profiles[this.profile]);
+  public switchProfile() {;
+    this.openDialog();
+  }
+
+  private openDialog() {    
+    const dialogRef = this.dialog.open(ProfileDialogComponent);
+
+    dialogRef.afterClosed().subscribe(
+        data => this.switch.emit(data)
+    );    
   }
 }

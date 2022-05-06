@@ -1,3 +1,4 @@
+using cbs.wanderOn.Configuration;
 using cbs.wanderOn.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +7,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IMapService, FileMapService>();
 
 builder.Services.AddSwaggerGen();
+
+builder.Services.Configure<ProfileConfig>(builder.Configuration.GetSection(ProfileConfig.Profiles));
 
 var app = builder.Build();
 

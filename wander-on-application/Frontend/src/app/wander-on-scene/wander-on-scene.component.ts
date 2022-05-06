@@ -8,8 +8,7 @@ import { WanderOnMapComponent } from '../wander-on-map/wander-on-map.component';
 })
 export class WanderOnSceneComponent {
   @ViewChild(WanderOnMapComponent) _map!: WanderOnMapComponent;
-  public readonly profiles = ["Edmund", "Teddy"];
-  public profile: string = this.profiles[0];
+  public profile: string = "";
 
   public printFeatures() {
     this._map.printFeatures();

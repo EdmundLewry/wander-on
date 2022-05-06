@@ -8,13 +8,18 @@ import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { WanderOnMapComponent } from './wander-on-map/wander-on-map.component';
 import { WanderOnSceneComponent } from './wander-on-scene/wander-on-scene.component';
+import { ProfileDialogComponent } from './profile-dialog/profile-dialog.component';
+import {MatDialogModule} from '@angular/material/dialog';
+import {MatButtonModule} from '@angular/material/button';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavMenuComponent,
     WanderOnMapComponent,
-    WanderOnSceneComponent
+    WanderOnSceneComponent,
+    ProfileDialogComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -22,7 +27,10 @@ import { WanderOnSceneComponent } from './wander-on-scene/wander-on-scene.compon
     FormsModule,
     RouterModule.forRoot([
       { path: '', component: WanderOnSceneComponent, pathMatch: 'full' },
-    ])
+    ]),
+    MatDialogModule,
+    MatButtonModule,
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

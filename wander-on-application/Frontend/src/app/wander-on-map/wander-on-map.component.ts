@@ -152,11 +152,15 @@ export class WanderOnMapComponent implements AfterViewInit {
     this.fileDropInteraction.on('addfeatures', function (event) {
       console.log("Adding new features");
       gpx.addFeatures(event.features as Feature<Geometry>[]);
-      dataService.saveWanderData(profile, geoJsonFormat.writeFeaturesObject(gpx.getFeatures()));
+      if(profile!="")
+        dataService.saveWanderData(profile, geoJsonFormat.writeFeaturesObject(gpx.getFeatures()));
     });
   }
 
   private retrieveTravelData() {
+    if(this.profile=="")
+      return;
+
     this.dataService.getWanderData(this.profile).subscribe(result => {
       this.gpxSource.clear();
       if (result != null) {
@@ -193,7 +197,8 @@ export class WanderOnMapComponent implements AfterViewInit {
     let features: Feature<Geometry>[] = this.gpxFormat.readFeatures(data, { featureProjection: 'EPSG:3857' });
     this.gpxSource.addFeatures(features);
 
-    this.dataService.saveWanderData(this.profile, this.geoJsonFormat.writeFeaturesObject(this.gpxSource.getFeatures()));
+    if(this.profile != "")
+      this.dataService.saveWanderData(this.profile, this.geoJsonFormat.writeFeaturesObject(this.gpxSource.getFeatures()));
   }
 
   public onProfileChanged(profile: string) {

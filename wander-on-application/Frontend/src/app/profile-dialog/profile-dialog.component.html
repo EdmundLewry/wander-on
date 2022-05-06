@@ -1,0 +1,9 @@
+<h2 mat-dialog-title>Change Profile</h2>
+<mat-dialog-content>
+    <label class="form-label" for="key">Profile Key</label>
+    <input type="text" name="key" (change)="updateKey($event)" />
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button (click)="close()">Close</button>
+    <button mat-button mat-dialog-close (click)="save()">Save</button>
+</mat-dialog-actions>
