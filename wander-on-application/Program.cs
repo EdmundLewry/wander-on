@@ -1,5 +1,6 @@
 using cbs.wanderOn.Configuration;
 using cbs.wanderOn.Controllers;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,10 @@ app.UseSwaggerUI();
 app.UseStaticFiles();
 app.UseRouting();
 
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 app.MapControllers();
 
